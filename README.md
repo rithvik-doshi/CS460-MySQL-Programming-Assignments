@@ -1,2 +1,2 @@
-# CS460-MySQL-Programming-Assignments
-MySQL Programming Assignments for CS460 Class Fall 2021
+# PA1.2
+MySQL and UI design
