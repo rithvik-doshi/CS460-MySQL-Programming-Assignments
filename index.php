@@ -34,16 +34,16 @@
                 <div class="input-group mb-3">
                     <!-- Make new div each time you want to create a new line for query button -->
                     <div class="input-group-prepend m-2">
-                        <button class="btn btn-outline-secondary" type="submit" name="submit3">Submit PQ3</button>
+                        <button class="btn btn-outline-secondary" type="submit" name="submit3">Query 3</button>
                     </div>
-                    <input type="text" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1" name="pq3val">
+                    <input type="text" class="form-control" placeholder="Enter user email" name="pq3val">
                 </div>
                 <div class="input-group mb-3">
                     <!-- Make new div each time you want to create a new line for query button -->
                     <div class="input-group-prepend m-2">
-                        <button class="btn btn-outline-secondary" type="submit" name="submit4">Submit PQ4</button>
+                        <button class="btn btn-outline-secondary" type="submit" name="submit4">Query 4</button>
                     </div>
-                    <input type="text" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1" name="pq4val">
+                    <input type="text" class="form-control" placeholder="Enter country" name="pq4val">
                 </div>
             </form>
         </div>
