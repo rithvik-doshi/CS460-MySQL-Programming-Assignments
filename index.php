@@ -17,33 +17,15 @@
         <div class = "container">
             <form id="ageLimitForm" method="post" action="">
                 <div class="input-group mb-3">
-                    <button class="btn btn-outline-secondary m-2" type="submit" name="submit1" id="button-addon1">Show all tables</button>
+                    <input type="text" class="form-control" placeholder="Enter parameter" name="input" id="input">
+                    <button class="btn btn-outline-secondary m-2" type="submit" name="submit1" id="button-addon1">Query 1</button>
+                    <button class="btn btn-outline-secondary m-2" type="submit" name="submit2" id="button-addon2">Query 2</button>
                     <button class="btn btn-outline-secondary m-2" type="submit" name="submit7" id="button-addon7">Query 7</button>
                     <button class="btn btn-outline-secondary m-2" type="submit" name="submit10" id="button-addon10">Query 10</button>
                     <button class="btn btn-outline-secondary m-2" type="submit" name="submit12" id="button-addon12">Query 12</button>
                     <button class="btn btn-outline-secondary m-2" type="submit" name="submit13" id="button-addon13">Query 13</button>
+                    <button class="btn btn-outline-secondary m-2" type="submit" name="submit14" id="button-addon14">Query 14</button>
                     <button class="btn btn-outline-secondary m-2" type="submit" name="submit15" id="button-addon15">Query 15</button>
-                </div>
-                <div class="input-group mb-3">
-                    <!-- Make new div each time you want to create a new line for query button -->
-                    <div class="input-group-prepend m-2">
-                        <button class="btn btn-outline-secondary" type="submit" name="submit2">Query 2</button>
-                    </div>
-                    <input type="text" class="form-control" placeholder="Enter Movie Name" name="pq2val">
-                </div>
-                <div class="input-group mb-3">
-                    <!-- Make new div each time you want to create a new line for query button -->
-                    <div class="input-group-prepend m-2">
-                        <button class="btn btn-outline-secondary" type="submit" name="submit3">Query 3</button>
-                    </div>
-                    <input type="text" class="form-control" placeholder="Enter user email" name="pq3val">
-                </div>
-                <div class="input-group mb-3">
-                    <!-- Make new div each time you want to create a new line for query button -->
-                    <div class="input-group-prepend m-2">
-                        <button class="btn btn-outline-secondary" type="submit" name="submit4">Query 4</button>
-                    </div>
-                    <input type="text" class="form-control" placeholder="Enter country" name="pq4val">
                 </div>
             </form>
         </div>
@@ -103,19 +85,18 @@
                     echo "</table>";
                 }
                 elseif(isset($_POST['submit2'])){
-                //                    $ageLimit = $_POST["inputAge"];
+                    $in = $_POST["input"];
                     echo "<table class='table table-md table-bordered'>";
                     echo "<thead class='thead-dark' style='text-align: center'>";
-                    echo "<tr><th class='col-md-2'>Actors</th>";
+                    echo "<tr><th class='col-md-2'>Name</th><th class='col-md-2'>Rating</th><th class='col-md-2'>Production</th><th class='col-md-2'>Budget</th></tr></thead>";
 
-                    
 
                     try {
                         $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
                         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
                         // SQL
-                        $stmt = $conn->prepare("SELECT DISTINCT name FROM People, Role WHERE role_name = 'Actor' AND Role.pid = People.pid ");
+                        $stmt = $conn->prepare("SELECT * FROM MotionPicture M WHERE M.name = $in ");
                         $stmt->execute();
 
                         // set the resulting array to associative
@@ -201,7 +182,7 @@
 
                             // SQL
                             $stmt = $conn->prepare(
-                                "SELECT DISTINCT People.name, MotionPicture.name from People, MotionPicture, Role where People.pid = Role.pid AND MotionPicture.mpid = Role.mpid AND (MotionPicture.production = 'Marvel' OR MotionPicture.production = 'DC') AND Role.role_name = 'Actor';");
+                                "SELECT DISTINCT People.name, MotionPicture.name AS Mname FROM People, MotionPicture, Role WHERE People.pid = Role.pid AND MotionPicture.mpid = Role.mpid AND  (MotionPicture.production = 'Marvel' OR MotionPicture.production = 'DC') AND Role.role_name = 'Actor';");
                             $stmt->execute();
 
                             // set the resulting array to associative
@@ -242,10 +223,10 @@
                         }
                         $conn = null;
                         echo "</table>";
-                    } elseif (isset($_POST['submit15'])){
+                    }elseif (isset($_POST['submit14'])){
                         echo "<table class='table table-md table-bordered'>";
                         echo "<thead class='thead-dark' style='text-align: center'>";
-                        echo "<tr><th class='col-md-2'>Name 1</th><th class='col-md-2'>Name 2</th><th class='col-md-2'>DOB</th></tr></thead>";
+                        echo "<tr><th class='col-md-2'>Movie Name</th><th class='col-md-2'>People Count</th><th class='col-md-2'>Role Count</th><th class='col-md-2'>Award Count</th></tr></thead>";
 
 
 
@@ -255,7 +236,34 @@
 
                             // SQL
                             $stmt = $conn->prepare(
-                                "SELECT x.P1name, x.P2name, x.PDOB FROM (SELECT CASE WHEN P1.name < P2.name then P1.name else P2.name end as P1name, CASE WHEN P1.name < P2.name then P2.name else P1.name end as P2name, P1.dob as PDOB from People as P1, People as P2 WHERE P1.pid != P2.pid and P1.dob = P2.dob) as x group by x.P1name, x.P2name;");
+                                "SELECT Count (pid) FROM Movie M, Role R WHERE M.mpid=R.mpid;");
+                            $stmt->execute();
+
+                            // set the resulting array to associative
+                            $stmt->setFetchMode(PDO::FETCH_ASSOC);
+                            foreach(new TableRows(new RecursiveArrayIterator($stmt->fetchAll())) as $k=>$v) {
+                                echo $v;
+                            }
+                        }
+                        catch(PDOException $e) {
+                            echo "Error: " . $e->getMessage();
+                        }
+                        $conn = null;
+                        echo "</table>";
+                    }elseif (isset($_POST['submit15'])){
+                        echo "<table class='table table-md table-bordered'>";
+                        echo "<thead class='thead-dark' style='text-align: center'>";
+                        echo "<tr><th class='col-md-2'>Actor 1 Name</th><th class='col-md-2'>Actor 2 Name</th><th class='col-md-2'>Birthday</th></tr></thead>";
+
+
+
+                        try {
+                            $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+                            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                            // SQL
+                            $stmt = $conn->prepare(
+                                "SELECT DISTINCT P1.name AS A, P2.name as B, P1.dob FROM Role R1, Role R2, People P1, People P2 WHERE P1.pid < P2.pid AND R1.role_name = 'Actor' AND R2.role_name = 'Actor' AND R1.pid = P1.pid AND R2.pid = P2.pid AND P1.dob = P2.dob;");
                             $stmt->execute();
 
                             // set the resulting array to associative
@@ -270,6 +278,7 @@
                         $conn = null;
                         echo "</table>";
                     }
+
             ?>
         </div>
     </body>
