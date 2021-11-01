@@ -18,11 +18,32 @@
             <form id="ageLimitForm" method="post" action="">
                 <div class="input-group mb-3">
                     <button class="btn btn-outline-secondary m-2" type="submit" name="submit1" id="button-addon1">Show all tables</button>
-                    <button class="btn btn-outline-secondary m-2" type="submit" name="submit2" id="button-addon2">View all actors</button>
                     <button class="btn btn-outline-secondary m-2" type="submit" name="submit7" id="button-addon7">Query 7</button>
-                    <button class="btn btn-outline-secondary m-2" type="submit" name="submit10" id="button-addon7">Query 10</button>
-                    <button class="btn btn-outline-secondary m-2" type="submit" name="submit12" id="button-addon7">Query 12</button>
-                    <button class="btn btn-outline-secondary m-2" type="submit" name="submit13" id="button-addon7">Query 13</button>
+                    <button class="btn btn-outline-secondary m-2" type="submit" name="submit10" id="button-addon10">Query 10</button>
+                    <button class="btn btn-outline-secondary m-2" type="submit" name="submit12" id="button-addon12">Query 12</button>
+                    <button class="btn btn-outline-secondary m-2" type="submit" name="submit13" id="button-addon13">Query 13</button>
+                    <button class="btn btn-outline-secondary m-2" type="submit" name="submit15" id="button-addon15">Query 15</button>
+                </div>
+                <div class="input-group mb-3">
+                    <!-- Make new div each time you want to create a new line for query button -->
+                    <div class="input-group-prepend m-2">
+                        <button class="btn btn-outline-secondary" type="submit" name="submit2">Query 2</button>
+                    </div>
+                    <input type="text" class="form-control" placeholder="Enter Movie Name" name="pq2val">
+                </div>
+                <div class="input-group mb-3">
+                    <!-- Make new div each time you want to create a new line for query button -->
+                    <div class="input-group-prepend m-2">
+                        <button class="btn btn-outline-secondary" type="submit" name="submit3">Submit PQ3</button>
+                    </div>
+                    <input type="text" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1" name="pq3val">
+                </div>
+                <div class="input-group mb-3">
+                    <!-- Make new div each time you want to create a new line for query button -->
+                    <div class="input-group-prepend m-2">
+                        <button class="btn btn-outline-secondary" type="submit" name="submit4">Submit PQ4</button>
+                    </div>
+                    <input type="text" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1" name="pq4val">
                 </div>
             </form>
         </div>
@@ -208,6 +229,33 @@
                             // SQL
                             $stmt = $conn->prepare(
                                 "SELECT MotionPicture.name, MotionPicture.rating FROM MotionPicture WHERE MotionPicture.rating > ALL (SELECT AVG(MotionPicture.rating) from MotionPicture, Genre WHERE Genre.genre_name = 'Comedy' AND MotionPicture.mpid = Genre.mpid) ORDER BY MotionPicture.rating DESC;");
+                            $stmt->execute();
+
+                            // set the resulting array to associative
+                            $stmt->setFetchMode(PDO::FETCH_ASSOC);
+                            foreach(new TableRows(new RecursiveArrayIterator($stmt->fetchAll())) as $k=>$v) {
+                                echo $v;
+                            }
+                        }
+                        catch(PDOException $e) {
+                            echo "Error: " . $e->getMessage();
+                        }
+                        $conn = null;
+                        echo "</table>";
+                    } elseif (isset($_POST['submit15'])){
+                        echo "<table class='table table-md table-bordered'>";
+                        echo "<thead class='thead-dark' style='text-align: center'>";
+                        echo "<tr><th class='col-md-2'>Name 1</th><th class='col-md-2'>Name 2</th><th class='col-md-2'>DOB</th></tr></thead>";
+
+
+
+                        try {
+                            $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+                            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                            // SQL
+                            $stmt = $conn->prepare(
+                                "SELECT x.P1name, x.P2name, x.PDOB FROM (SELECT CASE WHEN P1.name < P2.name then P1.name else P2.name end as P1name, CASE WHEN P1.name < P2.name then P2.name else P1.name end as P2name, P1.dob as PDOB from People as P1, People as P2 WHERE P1.pid != P2.pid and P1.dob = P2.dob) as x group by x.P1name, x.P2name;");
                             $stmt->execute();
 
                             // set the resulting array to associative
