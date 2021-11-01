@@ -20,6 +20,7 @@
                     <button class="btn btn-outline-secondary m-2" type="submit" name="submit1" id="button-addon1">Show all tables</button>
                     <button class="btn btn-outline-secondary m-2" type="submit" name="submit2" id="button-addon2">View all actors</button>
                     <button class="btn btn-outline-secondary m-2" type="submit" name="submit7" id="button-addon7">Query 7</button>
+                    <button class="btn btn-outline-secondary m-2" type="submit" name="submit10" id="button-addon7">Query 10</button>
                 </div>
             </form>
         </div>
@@ -124,6 +125,33 @@
                                 "SELECT name, (award_year - EXTRACT(YEAR FROM dob)) AS age FROM People, Award WHERE People.pid = Award.pid AND (award_year - EXTRACT(YEAR FROM dob)) >= ALL (SELECT (A.award_year - EXTRACT(YEAR FROM P.dob)) AS years FROM People P, Award A WHERE P.pid = A.pid)
                                 UNION
                                 SELECT name, (award_year - EXTRACT(YEAR FROM dob)) AS age FROM People, Award WHERE People.pid = Award.pid AND (award_year - EXTRACT(YEAR FROM dob)) <= ALL (SELECT (A.award_year - EXTRACT(YEAR FROM P.dob)) AS years FROM People P, Award A WHERE P.pid = A.pid)");
+                            $stmt->execute();
+
+                            // set the resulting array to associative
+                            $stmt->setFetchMode(PDO::FETCH_ASSOC);
+                            foreach(new TableRows(new RecursiveArrayIterator($stmt->fetchAll())) as $k=>$v) {
+                                echo $v;
+                            }
+                        }
+                        catch(PDOException $e) {
+                            echo "Error: " . $e->getMessage();
+                        }
+                        $conn = null;
+                        echo "</table>";
+                    } elseif (isset($_POST['submit10'])){
+                        echo "<table class='table table-md table-bordered'>";
+                        echo "<thead class='thead-dark' style='text-align: center'>";
+                        echo "<tr><th class='col-md-2'>Name</th><th class='col-md-2'>Age</th></tr></thead>";
+
+
+
+                        try {
+                            $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+                            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                            // SQL
+                            $stmt = $conn->prepare(
+                                "SELECT DISTINCT MotionPicture.name, MotionPicture.rating FROM Movie, MotionPicture, Genre, Location WHERE Movie.mpid = MotionPicture.mpid AND Movie.mpid = Genre.mpid AND Movie.mpid = Location.mpid AND Location.city = 'Boston' AND Genre.genre_name = 'Thriller' AND MotionPicture.mpid NOT IN (SELECT MotionPicture.mpid from Movie, MotionPicture, Genre, Location WHERE Movie.mpid = MotionPicture.mpid AND Movie.mpid = Genre.mpid AND Movie.mpid = Location.mpid AND Location.city != 'Boston' AND Genre.genre_name = 'Thriller') ORDER BY MotionPicture.rating DESC LIMIT 2;");
                             $stmt->execute();
 
                             // set the resulting array to associative
