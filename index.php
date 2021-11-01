@@ -141,7 +141,7 @@
                     } elseif (isset($_POST['submit10'])){
                         echo "<table class='table table-md table-bordered'>";
                         echo "<thead class='thead-dark' style='text-align: center'>";
-                        echo "<tr><th class='col-md-2'>Name</th><th class='col-md-2'>Age</th></tr></thead>";
+                        echo "<tr><th class='col-md-2'>Name</th><th class='col-md-2'>Rating</th></tr></thead>";
 
 
 
