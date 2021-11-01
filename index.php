@@ -21,6 +21,8 @@
                     <button class="btn btn-outline-secondary m-2" type="submit" name="submit2" id="button-addon2">View all actors</button>
                     <button class="btn btn-outline-secondary m-2" type="submit" name="submit7" id="button-addon7">Query 7</button>
                     <button class="btn btn-outline-secondary m-2" type="submit" name="submit10" id="button-addon7">Query 10</button>
+                    <button class="btn btn-outline-secondary m-2" type="submit" name="submit12" id="button-addon7">Query 12</button>
+                    <button class="btn btn-outline-secondary m-2" type="submit" name="submit13" id="button-addon7">Query 13</button>
                 </div>
             </form>
         </div>
@@ -165,8 +167,61 @@
                         }
                         $conn = null;
                         echo "</table>";
-                    }
+                    } elseif (isset($_POST['submit12'])){
+                        echo "<table class='table table-md table-bordered'>";
+                        echo "<thead class='thead-dark' style='text-align: center'>";
+                        echo "<tr><th class='col-md-2'>Name</th><th class='col-md-2'>MotionPicture Name</th></tr></thead>";
 
+
+
+                        try {
+                            $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+                            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                            // SQL
+                            $stmt = $conn->prepare(
+                                "SELECT DISTINCT People.name, MotionPicture.name from People, MotionPicture, Role where People.pid = Role.pid AND MotionPicture.mpid = Role.mpid AND (MotionPicture.production = 'Marvel' OR MotionPicture.production = 'DC') AND Role.role_name = 'Actor';");
+                            $stmt->execute();
+
+                            // set the resulting array to associative
+                            $stmt->setFetchMode(PDO::FETCH_ASSOC);
+                            foreach(new TableRows(new RecursiveArrayIterator($stmt->fetchAll())) as $k=>$v) {
+                                echo $v;
+                            }
+                        }
+                        catch(PDOException $e) {
+                            echo "Error: " . $e->getMessage();
+                        }
+                        $conn = null;
+                        echo "</table>";
+                    } elseif (isset($_POST['submit13'])){
+                        echo "<table class='table table-md table-bordered'>";
+                        echo "<thead class='thead-dark' style='text-align: center'>";
+                        echo "<tr><th class='col-md-2'>Name</th><th class='col-md-2'>Rating</th></tr></thead>";
+
+
+
+                        try {
+                            $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+                            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                            // SQL
+                            $stmt = $conn->prepare(
+                                "SELECT MotionPicture.name, MotionPicture.rating FROM MotionPicture WHERE MotionPicture.rating > ALL (SELECT AVG(MotionPicture.rating) from MotionPicture, Genre WHERE Genre.genre_name = 'Comedy' AND MotionPicture.mpid = Genre.mpid) ORDER BY MotionPicture.rating DESC;");
+                            $stmt->execute();
+
+                            // set the resulting array to associative
+                            $stmt->setFetchMode(PDO::FETCH_ASSOC);
+                            foreach(new TableRows(new RecursiveArrayIterator($stmt->fetchAll())) as $k=>$v) {
+                                echo $v;
+                            }
+                        }
+                        catch(PDOException $e) {
+                            echo "Error: " . $e->getMessage();
+                        }
+                        $conn = null;
+                        echo "</table>";
+                    }
             ?>
         </div>
     </body>
