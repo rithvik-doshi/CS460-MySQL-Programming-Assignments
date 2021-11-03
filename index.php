@@ -116,7 +116,111 @@
                         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
                         // SQL
-                        $stmt = $conn->prepare("SELECT M.name, M.rating, M.production, M.budget FROM MotionPicture M WHERE M.name LIKE '$in%' "); // For exact query, replace with M.name = '$in'
+                        $stmt = $conn->prepare("SELECT M.name, M.rating, M.production, M.budget FROM MotionPicture M WHERE M.name = '$in' "); // For exact query, replace with M.name = '$in'
+                        $stmt->execute();
+
+                        // set the resulting array to associative
+                        $stmt->setFetchMode(PDO::FETCH_ASSOC);
+                        foreach(new TableRows(new RecursiveArrayIterator($stmt->fetchAll())) as $k=>$v) {
+                            echo $v;
+                        }
+                    }
+                    catch(PDOException $e) {
+                        echo "Error: " . $e->getMessage();
+                    }
+                    $conn = null;
+                    echo "</table>";
+                }elseif(isset($_POST['submit3'])){
+                    $in = $_POST["input1"];
+                    echo "<table class='table table-md table-bordered'>";
+                    echo "<thead class='thead-dark' style='text-align: center'>";
+                    echo "<tr><th class='col-md-2'>Name</th><th class='col-md-2'>Rating</th><th class='col-md-2'>Production</th><th class='col-md-2'>Budget</th></tr></thead>";
+
+
+                    try {
+                        $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+                        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                        // SQL
+                        $stmt = $conn->prepare("SELECT M.name, M.rating, M.production, M.budget FROM MotionPicture M, Movie Mo, Likes L WHERE M.mpid = Mo.mpid AND L.uemail = '$in' AND Mo.mpid = L.mpid;"); // For exact query, replace with M.name = '$in'
+                        $stmt->execute();
+
+                        // set the resulting array to associative
+                        $stmt->setFetchMode(PDO::FETCH_ASSOC);
+                        foreach(new TableRows(new RecursiveArrayIterator($stmt->fetchAll())) as $k=>$v) {
+                            echo $v;
+                        }
+                    }
+                    catch(PDOException $e) {
+                        echo "Error: " . $e->getMessage();
+                    }
+                    $conn = null;
+                    echo "</table>";
+                }elseif(isset($_POST['submit4'])){
+                    $in = $_POST["input1"];
+                    echo "<table class='table table-md table-bordered'>";
+                    echo "<thead class='thead-dark' style='text-align: center'>";
+                    echo "<tr><th class='col-md-2'>Name</th></tr></thead>";
+
+
+                    try {
+                        $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+                        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                        // SQL
+                        $stmt = $conn->prepare("SELECT DISTINCT M.name FROM MotionPicture M, Location L WHERE M.mpid = L.mpid AND L.country = '$in';"); // For exact query, replace with M.name = '$in'
+                        $stmt->execute();
+
+                        // set the resulting array to associative
+                        $stmt->setFetchMode(PDO::FETCH_ASSOC);
+                        foreach(new TableRows(new RecursiveArrayIterator($stmt->fetchAll())) as $k=>$v) {
+                            echo $v;
+                        }
+                    }
+                    catch(PDOException $e) {
+                        echo "Error: " . $e->getMessage();
+                    }
+                    $conn = null;
+                    echo "</table>";
+                }elseif(isset($_POST['submit5'])){
+                    $in = $_POST["input1"];
+                    echo "<table class='table table-md table-bordered'>";
+                    echo "<thead class='thead-dark' style='text-align: center'>";
+                    echo "<tr><th class='col-md-2'>Director Name</th><th class='col-md-2'>TV series name</th></tr></thead>";
+
+
+                    try {
+                        $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+                        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                        // SQL
+                        $stmt = $conn->prepare("SELECT P.name, M.name AS Mat FROM People P, Role R, Location L, MotionPicture M, Series S WHERE L.zip = $in AND P.pid = R.pid AND R.role_name = 'Director' AND L.mpid = R.mpid AND S.mpid = L.mpid AND M.mpid = L.mpid;"); // For exact query, replace with M.name = '$in'
+                        $stmt->execute();
+
+                        // set the resulting array to associative
+                        $stmt->setFetchMode(PDO::FETCH_ASSOC);
+                        foreach(new TableRows(new RecursiveArrayIterator($stmt->fetchAll())) as $k=>$v) {
+                            echo $v;
+                        }
+                    }
+                    catch(PDOException $e) {
+                        echo "Error: " . $e->getMessage();
+                    }
+                    $conn = null;
+                    echo "</table>";
+                }elseif(isset($_POST['submit6'])){
+                    $in = $_POST["input1"];
+                    echo "<table class='table table-md table-bordered'>";
+                    echo "<thead class='thead-dark' style='text-align: center'>";
+                    echo "<tr><th class='col-md-2'>Person Name</th><th class='col-md-2'>Motion Picture Name</th><th class='col-md-2'>Award year</th><th class='col-md-2'>Award Count</th></tr></thead>";
+
+
+                    try {
+                        $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+                        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                        // SQL
+                        $stmt = $conn->prepare("SELECT P.name AS pname, M.name AS mat, A.award_year, COUNT(award_name)  FROM MotionPicture M, People P, Award A WHERE A.pid = P.pid AND A.mpid = M.mpid GROUP BY M.mpid, P.pid, A.award_year HAVING COUNT(award_name) > $in;"); // For exact query, replace with M.name = '$in'
                         $stmt->execute();
 
                         // set the resulting array to associative
@@ -131,6 +235,7 @@
                     $conn = null;
                     echo "</table>";
                 }
+
             
                 elseif(isset($_POST['submit7'])){
                     //                    $ageLimit = $_POST["inputAge"];
@@ -162,7 +267,60 @@
                         }
                         $conn = null;
                         echo "</table>";
-                    } elseif (isset($_POST['submit10'])){
+                    } elseif(isset($_POST['submit8'])){
+                        $in = $_POST["input1"];
+                        $in2 = $_POST["input2"];
+                        echo "<table class='table table-md table-bordered'>";
+                        echo "<thead class='thead-dark' style='text-align: center'>";
+                        echo "<tr><th class='col-md-2'>Director Name</th><th class='col-md-2'>Motion Picture Name</th><th class='col-md-2'>Box Office Collection</th><th class='col-md-2'>Budget</th></tr></thead>";
+
+
+                        try {
+                            $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+                            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                            // SQL
+                            $stmt = $conn->prepare("SELECT P.name AS pname, M.name AS mat, Mo.boxoffice_collection, M.budget  FROM MotionPicture M, People P, Role R, Movie Mo WHERE R.pid = P.pid AND R.mpid = M.mpid AND M.mpid = Mo.mpid AND Mo.boxoffice_collection >= $in AND M.budget <= $in2 AND R.role_name = 'Director' AND Mo.mpid = M.mpid;"); // For exact query, replace with M.name = '$in'
+                            $stmt->execute();
+
+                            // set the resulting array to associative
+                            $stmt->setFetchMode(PDO::FETCH_ASSOC);
+                            foreach(new TableRows(new RecursiveArrayIterator($stmt->fetchAll())) as $k=>$v) {
+                                echo $v;
+                            }
+                        }
+                        catch(PDOException $e) {
+                            echo "Error: " . $e->getMessage();
+                        }
+                        $conn = null;
+                        echo "</table>";
+                    }elseif(isset($_POST['submit9'])){
+                        $in = $_POST["input1"];
+                        echo "<table class='table table-md table-bordered'>";
+                        echo "<thead class='thead-dark' style='text-align: center'>";
+                        echo "<tr><th class='col-md-2'>Director Name</th><th class='col-md-2'>Motion Picture Name</th><th class='col-md-2'>Number of Roles</th></tr></thead>";
+
+
+                        try {
+                            $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+                            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                            // SQL
+                            $stmt = $conn->prepare("SELECT P.name AS pname, M.name AS mat, COUNT(R.role_name) FROM MotionPicture M, People P, Role R WHERE M.rating > floatval($in) AND R.pid = P.pid AND R.mpid = M.mpid GROUP BY P.pid, M.mpid HAVING COUNT(R.role_name) > 1;"); // For exact query, replace with M.name = '$in'
+                            $stmt->execute();
+
+                            // set the resulting array to associative
+                            $stmt->setFetchMode(PDO::FETCH_ASSOC);
+                            foreach(new TableRows(new RecursiveArrayIterator($stmt->fetchAll())) as $k=>$v) {
+                                echo $v;
+                            }
+                        }
+                        catch(PDOException $e) {
+                            echo "Error: " . $e->getMessage();
+                        }
+                        $conn = null;
+                        echo "</table>";
+                    }elseif (isset($_POST['submit10'])){
                         echo "<table class='table table-md table-bordered'>";
                         echo "<thead class='thead-dark' style='text-align: center'>";
                         echo "<tr><th class='col-md-2'>Name</th><th class='col-md-2'>Rating</th></tr></thead>";
