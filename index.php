@@ -10,22 +10,42 @@
     <body>
 
         <div class="container">
-            <h1 style="text-align:center"> CS460 PA1_3</h1><br>
-            <h3 style="text-align:center"> Rithvik Doshi and Vishesh Jain</h3><br>
+            <h1 style="text-align:center">CS460 PA1_3: localhostMovieDb</h1><br>
+            <h3 style="text-align:center">Rithvik Doshi and Vishesh Jain</h3><br>
         </div>
 
         <div class = "container">
             <form id="ageLimitForm" method="post" action="">
                 <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="Enter parameter" name="input" id="input">
-                    <button class="btn btn-outline-secondary m-2" type="submit" name="submit1" id="button-addon1">Query 1</button>
-                    <button class="btn btn-outline-secondary m-2" type="submit" name="submit2" id="button-addon2">Query 2</button>
-                    <button class="btn btn-outline-secondary m-2" type="submit" name="submit7" id="button-addon7">Query 7</button>
-                    <button class="btn btn-outline-secondary m-2" type="submit" name="submit10" id="button-addon10">Query 10</button>
-                    <button class="btn btn-outline-secondary m-2" type="submit" name="submit12" id="button-addon12">Query 12</button>
-                    <button class="btn btn-outline-secondary m-2" type="submit" name="submit13" id="button-addon13">Query 13</button>
-                    <button class="btn btn-outline-secondary m-2" type="submit" name="submit14" id="button-addon14">Query 14</button>
-                    <button class="btn btn-outline-secondary m-2" type="submit" name="submit15" id="button-addon15">Query 15</button>
+                    <!-- Make new div each time you want to create a new line for query button -->
+                    <div class="input-group-prepend m-2">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="submit" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                           Select Query:
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <button class="dropdown-item" name="submit1" type="submit">Query 1</button>
+                            <button class="dropdown-item" name="submit2" type="submit">Query 2</button>
+                            <button class="dropdown-item" name="submit3" type="submit">Query 3</button>
+                            <button class="dropdown-item" name="submit4" type="submit">Query 4</button>
+                            <button class="dropdown-item" name="submit5" type="submit">Query 5</button>
+                            <button class="dropdown-item" name="submit6" type="submit">Query 6</button>
+                            <button class="dropdown-item" name="submit7" type="submit">Query 7</button>
+                            <button class="dropdown-item" name="submit8" type="submit">Query 8</button>
+                            <button class="dropdown-item" name="submit9" type="submit">Query 9</button>
+                            <button class="dropdown-item" name="submit10" type="submit">Query 10</button>
+                            <button class="dropdown-item" name="submit11" type="submit">Query 11</button>
+                            <button class="dropdown-item" name="submit12" type="submit">Query 12</button>
+                            <button class="dropdown-item" name="submit13" type="submit">Query 13</button>
+                            <button class="dropdown-item" name="submit14" type="submit">Query 14</button>
+                            <button class="dropdown-item" name="submit15" type="submit">Query 15</button>
+
+                        </div>
+                    </div>
+                    <input type="text" class="form-control" placeholder="Enter parameter 1 if needed" name="input1" id="input1">
+                    <input type="text" class="form-control" placeholder="Enter parameter 2 if needed" name="input2" id="input2">
+                </div>
+                <div class="input-group mb-3">
+                    <button class="btn btn-outline-secondary m-2" type="submit" name="submit16">Show Likes Table</button>
                 </div>
             </form>
         </div>
@@ -85,7 +105,7 @@
                     echo "</table>";
                 }
                 elseif(isset($_POST['submit2'])){
-                    $in = $_POST["input"];
+                    $in = $_POST["input1"];
                     echo "<table class='table table-md table-bordered'>";
                     echo "<thead class='thead-dark' style='text-align: center'>";
                     echo "<tr><th class='col-md-2'>Name</th><th class='col-md-2'>Rating</th><th class='col-md-2'>Production</th><th class='col-md-2'>Budget</th></tr></thead>";
@@ -96,7 +116,7 @@
                         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
                         // SQL
-                        $stmt = $conn->prepare("SELECT * FROM MotionPicture M WHERE M.name = $in ");
+                        $stmt = $conn->prepare("SELECT M.name, M.rating, M.production, M.budget FROM MotionPicture M WHERE M.name LIKE '$in%' "); // For exact query, replace with M.name = '$in'
                         $stmt->execute();
 
                         // set the resulting array to associative
@@ -223,7 +243,7 @@
                         }
                         $conn = null;
                         echo "</table>";
-                    }elseif (isset($_POST['submit14'])){
+                    } elseif (isset($_POST['submit14'])){
                         echo "<table class='table table-md table-bordered'>";
                         echo "<thead class='thead-dark' style='text-align: center'>";
                         echo "<tr><th class='col-md-2'>Movie Name</th><th class='col-md-2'>People Count</th><th class='col-md-2'>Role Count</th><th class='col-md-2'>Award Count</th></tr></thead>";
@@ -236,7 +256,7 @@
 
                             // SQL
                             $stmt = $conn->prepare(
-                                "SELECT Count (pid) FROM Movie M, Role R WHERE M.mpid=R.mpid;");
+                                "SELECT Count(R.pid) FROM Movie M, Role R WHERE M.mpid=R.mpid;");
                             $stmt->execute();
 
                             // set the resulting array to associative
@@ -250,7 +270,7 @@
                         }
                         $conn = null;
                         echo "</table>";
-                    }elseif (isset($_POST['submit15'])){
+                    } elseif (isset($_POST['submit15'])){
                         echo "<table class='table table-md table-bordered'>";
                         echo "<thead class='thead-dark' style='text-align: center'>";
                         echo "<tr><th class='col-md-2'>Actor 1 Name</th><th class='col-md-2'>Actor 2 Name</th><th class='col-md-2'>Birthday</th></tr></thead>";
@@ -277,8 +297,50 @@
                         }
                         $conn = null;
                         echo "</table>";
-                    }
+                    } elseif (isset($_POST['submit16'])){
+                        echo "<table class='table table-md table-bordered'>";
+                        echo "<thead class='thead-dark' style='text-align: center'>";
+                        echo "<tr><th class='col-md-2'>mpid</th><th class='col-md-2'>Name</th><th class='col-md-2'>Likes</th></tr></thead>";
 
+
+
+                        try {
+                            $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+                            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                            // SQL
+                            $stmt = $conn->prepare(
+                                "SELECT MotionPicture.mpid, MotionPicture.name, COUNT(Likes.uemail) FROM Likes, MotionPicture WHERE Likes.mpid = MotionPicture.mpid GROUP BY Likes.mpid;");
+                            $stmt->execute();
+
+                            // set the resulting array to associative
+                            $stmt->setFetchMode(PDO::FETCH_ASSOC);
+                            foreach(new TableRows(new RecursiveArrayIterator($stmt->fetchAll())) as $k=>$v) {
+                                echo $v;
+                            }
+                        }
+                        catch(PDOException $e) {
+                            echo "Error: " . $e->getMessage();
+                        }
+                        $conn = null;
+                        echo "</table>";
+                        ?>
+                        <div class='input-group mb-3'>
+                            <form id="ageLimitForm" method="post" action="">
+                                <div class='input-group-prepend m-2'>
+                                    <button class='btn btn-outline-secondary' name='submit17' type='submit'>Submit new Likes</button>
+                                </div>
+                                <input type='text' class='form-control' placeholder='Enter valid user email' name='input3' id='input3'>
+                                <input type='text' class='form-control' placeholder='Enter mpid to like' name='input4' id='input4'>
+                            </form>
+                        </div>
+                        <?php
+                    } elseif (isset($_POST['submit17'])){
+                        $user = $_POST["input3"];
+                        $mpid = $_POST["input4"];
+                        echo "Hello, $user liked $mpid";
+                        echo "<script>console.log('Bruh moment');</script>";
+                    }
             ?>
         </div>
     </body>
