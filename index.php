@@ -74,7 +74,7 @@
                 $servername = "localhost";
                 $username = "root";
                 $password = "";
-                $dbname = "pa1-3";
+                $dbname = "pa1-2";
                 if(isset($_POST['submit1']))
                 {
 //                    $ageLimit = $_POST["inputAge"];
@@ -299,6 +299,7 @@
                         echo "<table class='table table-md table-bordered'>";
                         echo "<thead class='thead-dark' style='text-align: center'>";
                         echo "<tr><th class='col-md-2'>Director Name</th><th class='col-md-2'>Motion Picture Name</th><th class='col-md-2'>Number of Roles</th></tr></thead>";
+                        $in3 = floatval($in);
 
 
                         try {
@@ -306,7 +307,7 @@
                             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
                             // SQL
-                            $stmt = $conn->prepare("SELECT P.name AS pname, M.name AS mat, COUNT(R.role_name) FROM MotionPicture M, People P, Role R WHERE M.rating > floatval($in) AND R.pid = P.pid AND R.mpid = M.mpid GROUP BY P.pid, M.mpid HAVING COUNT(R.role_name) > 1;"); // For exact query, replace with M.name = '$in'
+                            $stmt = $conn->prepare("SELECT P.name AS pname, M.name AS mat, COUNT(R.role_name) FROM MotionPicture M, People P, Role R WHERE M.rating > $in3 AND R.pid = P.pid AND R.mpid = M.mpid GROUP BY R.pid, R.mpid HAVING COUNT(R.role_name) > 1;"); // For exact query, replace with M.name = '$in'
                             $stmt->execute();
 
                             // set the resulting array to associative
@@ -334,6 +335,33 @@
                             // SQL
                             $stmt = $conn->prepare(
                                 "SELECT DISTINCT MotionPicture.name, MotionPicture.rating FROM Movie, MotionPicture, Genre, Location WHERE Movie.mpid = MotionPicture.mpid AND Movie.mpid = Genre.mpid AND Movie.mpid = Location.mpid AND Location.city = 'Boston' AND Genre.genre_name = 'Thriller' AND MotionPicture.mpid NOT IN (SELECT MotionPicture.mpid from Movie, MotionPicture, Genre, Location WHERE Movie.mpid = MotionPicture.mpid AND Movie.mpid = Genre.mpid AND Movie.mpid = Location.mpid AND Location.city != 'Boston' AND Genre.genre_name = 'Thriller') ORDER BY MotionPicture.rating DESC LIMIT 2;");
+                            $stmt->execute();
+
+                            // set the resulting array to associative
+                            $stmt->setFetchMode(PDO::FETCH_ASSOC);
+                            foreach(new TableRows(new RecursiveArrayIterator($stmt->fetchAll())) as $k=>$v) {
+                                echo $v;
+                            }
+                        }
+                        catch(PDOException $e) {
+                            echo "Error: " . $e->getMessage();
+                        }
+                        $conn = null;
+                        echo "</table>";
+                    }elseif(isset($_POST['submit11'])){
+                        $in = $_POST["input1"];
+                        $in2 = $_POST["input2"];
+                        echo "<table class='table table-md table-bordered'>";
+                        echo "<thead class='thead-dark' style='text-align: center'>";
+                        echo "<tr><th class='col-md-2'>Movie Name</th><th class='col-md-2'>Number of Likes</th></tr></thead>";
+
+
+                        try {
+                            $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+                            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                            // SQL
+                            $stmt = $conn->prepare("SELECT Mo.name AS mat, COUNT(U.email) FROM Movie M, MotionPicture Mo, Likes L, User_table U WHERE Mo.mpid = M.mpid AND M.mpid = L.mpid AND L.uemail = U.email AND U.age < $in2 GROUP BY M.mpid HAVING COUNT(U.email) > $in;");
                             $stmt->execute();
 
                             // set the resulting array to associative
@@ -464,7 +492,7 @@
 
                         try {
                             $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-                            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                                                    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
                             // SQL
                             $stmt = $conn->prepare(
@@ -494,10 +522,29 @@
                         </div>
                         <?php
                     } elseif (isset($_POST['submit17'])){
-                        $user = $_POST["input3"];
-                        $mpid = $_POST["input4"];
-                        echo "Hello, $user liked $mpid";
-                        echo "<script>console.log('Bruh moment');</script>";
+                        $user1 = $_POST["input3"];
+                        $mpid1 = $_POST["input4"];
+                        try {
+                            $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+                            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                            // SQL
+                            $stmt = $conn->prepare(
+                                "INSERT INTO LIKES VALUES ($mpid1, '$user1');");
+                            $stmt->execute();
+                            echo "Hello, $user liked $mpid";
+                            echo "<script>console.log('Bruh moment');</script>";
+                            // set the resulting array to associative
+                            $stmt->setFetchMode(PDO::FETCH_ASSOC);
+                            foreach(new TableRows(new RecursiveArrayIterator($stmt->fetchAll())) as $k=>$v) {
+                                echo $v;
+                            }
+                            
+                        }
+                        catch(PDOException $e) {
+                            echo "Error: " . $e->getMessage();
+                        }
+                        $conn = null;
                     }
             ?>
         </div>
