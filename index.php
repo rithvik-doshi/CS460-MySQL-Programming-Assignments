@@ -251,9 +251,17 @@
 
                             // SQL
                             $stmt = $conn->prepare(
-                                "SELECT name, (award_year - EXTRACT(YEAR FROM dob)) AS age FROM People, Award WHERE People.pid = Award.pid AND (award_year - EXTRACT(YEAR FROM dob)) >= ALL (SELECT (A.award_year - EXTRACT(YEAR FROM P.dob)) AS years FROM People P, Award A WHERE P.pid = A.pid)
+                                "((SELECT name, (award_year - EXTRACT(YEAR FROM dob)) AS age1
+                                FROM People, Award
+                                WHERE Award.award_name = 'Best Actor' AND People.pid = Award.pid
+                                ORDER BY age1 DESC
+                                LIMIT 1)
                                 UNION
-                                SELECT name, (award_year - EXTRACT(YEAR FROM dob)) AS age FROM People, Award WHERE People.pid = Award.pid AND (award_year - EXTRACT(YEAR FROM dob)) <= ALL (SELECT (A.award_year - EXTRACT(YEAR FROM P.dob)) AS years FROM People P, Award A WHERE P.pid = A.pid)");
+                                (SELECT name, (award_year - EXTRACT(YEAR FROM dob)) AS age1
+                                FROM People, Award
+                                WHERE Award.award_name = 'Best Actor' AND People.pid = Award.pid
+                                ORDER BY age1 ASC
+                                LIMIT 1));");
                             $stmt->execute();
 
                             // set the resulting array to associative
@@ -432,7 +440,7 @@
                     } elseif (isset($_POST['submit14'])){
                         echo "<table class='table table-md table-bordered'>";
                         echo "<thead class='thead-dark' style='text-align: center'>";
-                        echo "<tr><th class='col-md-2'>Movie Name</th><th class='col-md-2'>People Count</th><th class='col-md-2'>Role Count</th><th class='col-md-2'>Award Count</th></tr></thead>";
+                        echo "<tr><th class='col-md-2'>Movie Name</th><th class='col-md-2'>People Count</th><th class='col-md-2'>Role Count</th></tr></thead>";
 
 
 
@@ -442,7 +450,12 @@
 
                             // SQL
                             $stmt = $conn->prepare(
-                                "SELECT Count(R.pid) FROM Movie M, Role R WHERE M.mpid=R.mpid;");
+                                "SELECT Mo.name, COUNT(DISTINCT P.pid) AS pcount, Count(R.role_name) AS rcount
+                                FROM Movie M, MotionPicture Mo, Role R, People P
+                                WHERE M.mpid=R.mpid AND R.pid = P.pid AND Mo.mpid = M.mpid
+                                GROUP BY M.mpid
+                                ORDER BY pcount DESC
+                                LIMIT 5;");
                             $stmt->execute();
 
                             // set the resulting array to associative
